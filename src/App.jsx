@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Cell from "./components/Cell";
 import "./App.css";
 
+import { handleClick } from "./utils/utils";
+
 const App = () => {
   const [cells, setCells] = useState(["", "", "", "", "", "", "", "", ""]);
   const [go, setGo] = useState("circle");
@@ -31,44 +33,6 @@ const App = () => {
     });
   };
 
-  const handleClick = ({ target }) => {
-    if (!winningMessage) {
-      const taken =
-        target.firstChild?.classList.contains("circle") ||
-        target.firstChild?.classList.contains("cross") ||
-        target.firstChild?.classList.contains("square") ||
-        target.classList.contains("circle") ||
-        target.classList.contains("cross");
-
-      if (!taken) {
-        const id = Number(target.id);
-
-        if (go === "circle") {
-          target.firstChild.classList.add("circle");
-          handleCellChange("circle", id);
-          setGo("cross");
-        }
-
-        if (go === "cross") {
-          target.firstChild.classList.add("cross");
-          handleCellChange("cross", id);
-          setGo("circle");
-        }
-      }
-    }
-    return;
-  };
-
-  const handleCellChange = (className, id) => {
-    const nextCells = cells.map((cell, index) => {
-      if (index === id) return className;
-
-      return cell;
-    });
-
-    setCells(nextCells);
-  };
-
   useEffect(() => {
     checkScore();
   }, [cells]);
@@ -76,7 +40,11 @@ const App = () => {
   return (
     <div className='app'>
       <h1>Tic Tac Toe</h1>
-      <div className='gameboard' onClick={handleClick}>
+      <div
+        className='gameboard'
+        onClick={(e) =>
+          handleClick(e, winningMessage, go, setGo, cells, setCells)
+        }>
         {cells.map((cell, i) => (
           <Cell key={i} cell={cell} id={i} />
         ))}
