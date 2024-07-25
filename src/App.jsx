@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Cell from "./components/Cell";
 import "./App.css";
@@ -10,27 +10,53 @@ const App = () => {
 
   const message = "It is now " + go + "'s go";
 
+  const checkScore = () => {
+    const winningCombos = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    winningCombos.forEach((arr) => {
+      let circleWins = arr.every((cell) => cells[cell] === "circle");
+      if (circleWins) return setWinningMessage("Circle Wins!");
+
+      let crossWins = arr.every((cell) => cells[cell] === "cross");
+      if (crossWins) return setWinningMessage("Cross Wins");
+    });
+  };
+
   const handleClick = ({ target }) => {
-    const taken =
-      target.firstChild.classList.contains("circle") ||
-      target.firstChild.classList.contains("cross") ||
-      target.firstChild.classList.contains("square");
+    if (!winningMessage) {
+      const taken =
+        target.firstChild?.classList.contains("circle") ||
+        target.firstChild?.classList.contains("cross") ||
+        target.firstChild?.classList.contains("square") ||
+        target.classList.contains("circle") ||
+        target.classList.contains("cross");
 
-    const id = Number(target.id);
+      if (!taken) {
+        const id = Number(target.id);
 
-    if (!taken) {
-      if (go === "circle") {
-        target.firstChild.classList.add("circle");
-        handleCellChange("circle", id);
-        setGo("cross");
-      }
+        if (go === "circle") {
+          target.firstChild.classList.add("circle");
+          handleCellChange("circle", id);
+          setGo("cross");
+        }
 
-      if (go === "cross") {
-        target.firstChild.classList.add("cross");
-        handleCellChange("cross", id);
-        setGo("circle");
+        if (go === "cross") {
+          target.firstChild.classList.add("cross");
+          handleCellChange("cross", id);
+          setGo("circle");
+        }
       }
     }
+    return;
   };
 
   const handleCellChange = (className, id) => {
@@ -42,6 +68,10 @@ const App = () => {
 
     setCells(nextCells);
   };
+
+  useEffect(() => {
+    checkScore();
+  }, [cells]);
 
   return (
     <div className='app'>
